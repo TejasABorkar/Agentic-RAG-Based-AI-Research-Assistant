@@ -1,0 +1,7 @@
+PyMuPDF
+sentence-transformers
+chromadb
+google-genai
+streamlit
+duckduckgo-search
+python-dotenv
