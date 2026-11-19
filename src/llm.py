@@ -1,19 +1,27 @@
-from google import genai
-from google.genai import types  # <-- हे नवीन इम्पोर्ट जोड
-from src.config import GEMINI_API_KEY
+from groq import Groq
+from src.config import GROQ_API_KEY
+import time
 
-# क्लायंट बनवताना आवृत्ती v1beta अशी सेट कर
-client = genai.Client(
-    api_key=GEMINI_API_KEY,
-    http_options=types.HttpOptions(api_version='v1beta')  # <-- हे महत्त्वाचं
-)
+client = Groq(api_key=GROQ_API_KEY)
 
 def ask_llm(prompt):
-    try:
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        return f"ERROR: {str(e)}"
+    models_to_try = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+    
+    for model_name in models_to_try:
+        for attempt in range(3):
+            try:
+                chat_completion = client.chat.completions.create(
+                    messages=[{"role": "user", "content": prompt}],
+                    model=model_name,
+                )
+                return chat_completion.choices[0].message.content
+            except Exception as e:
+                error_msg = str(e)
+                if "503" in error_msg or "429" in error_msg or "rate limit" in error_msg.lower():
+                    print(f"Model {model_name} is busy. Retrying in 2 seconds...")
+                    time.sleep(2)
+                else:
+                    print(f"Model {model_name} failed: {error_msg}")
+                    break 
+                    
+    return "ERROR: All Groq models are currently busy. Please try again in a few minutes."
