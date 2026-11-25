@@ -4,17 +4,49 @@ from src.web_search import web_search
 
 def web_fallback_answer(question):
     """जेव्हा डॉक्युमेंटमध्ये उत्तर नसेल, तेव्हा वेब सर्च करण्यासाठीचं फंक्शन"""
-    web_results = web_search(question)
+    web_results = web_search(question, max_results=10)
     if not web_results:
-        return {"answer": "No information found on the web.", "source": "Not found", "pages": []}
+        return {"answer": "I could not find any relevant information on the web. Please try rephrasing your question.", "source": "Not found", "pages": []}
+    
+    results_text = "\n\n".join([
+        f"[{i+1}] Title: {r['title']}\nSnippet: {r['snippet']}"
+        for i, r in enumerate(web_results)
+    ])
+    
+    # 🔴 प्रॉम्प्ट सुधारला: जर काहीच रेलेव्हंट नसेल तर 'None' म्हणायला सांगितलं आहे
+    rank_prompt = f"""You are a strict search assistant. Given the user's question and 10 search results, identify the top 3 most relevant results that actually answer the question.
+If none of the results are relevant, return exactly: None
+Return ONLY the numbers of the top 3 results as a comma-separated list (e.g., 2, 5, 7). Do not include any other text.
+
+Question: {question}
+
+Search Results:
+{results_text}
+
+Top 3 result numbers (or 'None'):"""
+    
+    top_indices_str = ask_llm(rank_prompt).strip()
+    
+    if "None" in top_indices_str:
+        return {"answer": "I could not find any relevant information on the web for this question.", "source": "Not found", "pages": []}
+
+    try:
+        top_indices = [int(i.strip()) - 1 for i in top_indices_str.split(",") if i.strip().isdigit()]
+        top_indices = top_indices[:3]
+        if not top_indices:
+            top_indices = [0, 1, 2] 
+    except:
+        top_indices = [0, 1, 2]
+        
+    top_results = [web_results[i] for i in top_indices if i < len(web_results)]
     
     context = "\n\n".join([
         f"[{i+1}] {r['title']}: {r['snippet']}\nURL: {r['url']}"
-        for i, r in enumerate(web_results[:3])
+        for i, r in enumerate(top_results)
     ])
     
-    prompt = f"""Answer using ONLY these web results. Mention source number.
-If results insufficient, say so.
+    answer_prompt = f"""Answer using ONLY these web results. Mention the source number if possible.
+If the results are insufficient, say so.
 
 Results:
 {context}
@@ -22,11 +54,11 @@ Results:
 Question: {question}
 Answer:"""
     
-    answer = ask_llm(prompt)
+    answer = ask_llm(answer_prompt)
     return {
         "answer": answer,
         "source": "From web",
-        "urls": [r['url'] for r in web_results[:3]],
+        "urls": [r['url'] for r in top_results],
         "pages": []
     }
 
