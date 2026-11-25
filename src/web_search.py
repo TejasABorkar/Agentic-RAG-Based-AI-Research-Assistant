@@ -1,6 +1,6 @@
 from duckduckgo_search import DDGS
 
-def web_search(query, max_results=3):
+def web_search(query, max_results=10):  # ३ वरून १० केलं
     try:
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=max_results))
