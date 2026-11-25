@@ -2,10 +2,25 @@
 
 An **agentic Retrieval-Augmented Generation (RAG)** system that lets you upload research papers or long PDFs, get a concise summary, and ask questions in a chat interface. The agent searches your document first. If the answer isn't there, it automatically falls back to a **web search** and returns an answer with cited sources.
 
+> 🔗 **Live Demo:** [Open the app](https://YOUR-APP-URL.streamlit.app)
+
+---
+
+## 📸 Screenshots
+
+**Home screen**: upload a PDF from the sidebar and click *Process Document*.
+
+![Home screen](data/app-home.png)
+
+**Document summary and chat**: auto-generated summary, followed by a chat box for questions.
+
+![Summary and chat](data/app-summary.png)
+
 ---
 
 ## 📑 Table of Contents
 
+- [Screenshots](#-screenshots)
 - [Features](#-features)
 - [How It Works](#-how-it-works)
 - [Tech Stack](#-tech-stack)
@@ -105,7 +120,10 @@ Agentic-RAG-Based-AI-Research-Assistant/
 │   ├── web_search.py      # DuckDuckGo web search integration
 │   └── qa.py              # Agentic decision logic (Document vs Web)
 │
-├── data/                  # Sample PDFs
+├── data/                  # Sample PDFs and README screenshots
+├── chroma_db/             # Local vector store (auto-generated, git-ignored)
+├── evaluate.py            # Evaluation script
+├── questions.json         # Evaluation questions
 ├── .env.example           # Environment variable template
 ├── .gitignore
 ├── requirements.txt       # Python dependencies
