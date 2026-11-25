@@ -1,16 +1,15 @@
-import fitz
+import os
 
-def load_pdf(file_path):
-    doc = fitz.open(file_path)
+import fitz  # PyMuPDF
+
+
+def load_pdf(file_path, display_name=None):
+    """Return a list of {"text", "page", "source"} for pages that contain text."""
+    source = display_name or os.path.basename(file_path)
     pages = []
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        text = page.get_text()
-        if text.strip():
-            pages.append({
-                "text": text,
-                "page": page_num + 1,
-                "source": file_path.split("\\")[-1]
-            })
-    doc.close()
+    with fitz.open(file_path) as doc:
+        for index, page in enumerate(doc):
+            text = page.get_text().strip()
+            if text:
+                pages.append({"text": text, "page": index + 1, "source": source})
     return pages

@@ -1,7 +1,8 @@
 PyMuPDF
 sentence-transformers
 chromadb
-google-genai
 streamlit
-duckduckgo-search
+groq
+ddgs
 python-dotenv
+google-genai

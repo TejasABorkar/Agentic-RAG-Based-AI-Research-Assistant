@@ -1,0 +1,14 @@
+[
+  {
+    "question": "Replace with a question whose answer is in the PDF",
+    "expected": "The correct answer written before testing",
+    "in_doc": true,
+    "page": 5
+  },
+  {
+    "question": "Replace with a question NOT covered by the PDF",
+    "expected": "NOT IN DOCUMENT",
+    "in_doc": false,
+    "page": null
+  }
+]
