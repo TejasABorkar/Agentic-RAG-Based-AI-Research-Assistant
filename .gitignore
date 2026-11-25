@@ -18,3 +18,7 @@ chroma_db/
 .DS_Store
 Thumbs.dbchroma_db/
 results*.csv
+.env
+chroma_db/
+.streamlit/secrets.toml
+venv/
